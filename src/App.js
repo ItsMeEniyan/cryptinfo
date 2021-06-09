@@ -4,6 +4,7 @@ import axios from "axios";
 
 export default function App() {
   const [coins, getcoins] = useState([]);
+  const [currencies, getcurrencies] = useState([]);
   const [apiresult, getapiresult] = useState("");
   const [selectedcoin, getselectedcoin] = useState("");
   const [selectedcurrency, getselectedcurrency] = useState("");
@@ -20,9 +21,31 @@ export default function App() {
       })
       .catch((error) => console.error(`Error: ${error}`));
   };
+  const getallcurrencies = () => {
+    axios
+      .get("https://api.coingecko.com/api/v3/simple/supported_vs_currencies")
+      .then((response) => {
+        //console.log(response.data[7000].id,response.data[7000].symbol,response.data[7000].name);
+        const allcurrencies = response.data;
+        getcurrencies(allcurrencies);
+        //console.log(coins[7000].id,coins[7000].symbol,coins[7000].name);
+        //console.log(coins);
+      })
+      .catch((error) => console.error(`Error: ${error}`));
+  };
   useEffect(() => {
     getallcoins();
+    getallcurrencies();
   }, []);
+
+  Object.size = function (obj) {
+    var size = 0,
+      key;
+    for (key in obj) {
+      if (obj.hasOwnProperty(key)) size++;
+    }
+    return size;
+  };
 
   return (
     <div className="App">
@@ -31,15 +54,23 @@ export default function App() {
         onSubmit={(e) => {
           console.log(selectedcoin);
           axios
-            .get(`https://api.coingecko.com/api/v3/simple/price?ids=${selectedcoin}&vs_currencies=inr`)
+            .get(
+              `https://api.coingecko.com/api/v3/simple/price?ids=${selectedcoin}&vs_currencies=${selectedcurrency}`
+            )
             .then((response) => {
               //getapiresult(response.data);
               //console.log(response.data)
-             // const tempresult= response.data
-             const inttempresult =response.data[`${selectedcoin}`].inr;
-             const strtempresult =inttempresult.toString();
-              //getapiresult(response.data[`${selectedcoin}`].inr)
-              getapiresult(strtempresult);
+              // const tempresult= response.data
+              //console.log(response)
+              if (Object.size(response.data) === 0) {
+                //console.log("haiii")
+                getapiresult("Please enter valid Coin name");
+              } else {
+                const inttempresult = response.data[`${selectedcoin}`][`${selectedcurrency}`];
+                const strtempresult = inttempresult.toString();
+                //getapiresult(response.data[`${selectedcoin}`].inr)
+                getapiresult(strtempresult+` ${selectedcurrency}`);
+              }
               //console.log(apiresult)
               //console.log(strtempresult)
               //console.log(response.data[`${selectedcoin}`].inr)
@@ -49,6 +80,7 @@ export default function App() {
           e.preventDefault();
         }}
       >
+      <label>Coin</label>
         <input
           type="text"
           list="coins"
@@ -59,7 +91,23 @@ export default function App() {
           {
             <>
               {coins.map((coin) => {
-                return <option key={coin.id} >{coin.id}</option>;
+                return <option key={coin.id}>{coin.id}</option>;
+              })}
+            </>
+          }
+        </datalist>
+        <label>Currency</label>
+        <input
+          type="text"
+          list="currencies"
+          value={selectedcurrency}
+          onChange={(e) => getselectedcurrency(e.target.value)}
+        />
+        <datalist id="currencies">
+          {
+            <>
+              {currencies.map((currency) => {
+                return <option key={currency}>{currency}</option>;
               })}
             </>
           }
