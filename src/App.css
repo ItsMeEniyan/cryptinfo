@@ -4,3 +4,11 @@ body{
   justify-content: center;
   align-items: center;
 }
+.title{
+  font-size: 40px;
+}
+.confetti{
+  position: absolute;
+  left: 50%;
+  top: 50%;
+}

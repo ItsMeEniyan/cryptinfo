@@ -1,6 +1,9 @@
 import "./App.css";
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { Button, Form, FormGroup, Label, Input } from "reactstrap";
+import LinearProgress from "@material-ui/core/LinearProgress";
+import Confetti from "react-dom-confetti";
 
 export default function App() {
   const [coins, getcoins] = useState([]);
@@ -8,6 +11,22 @@ export default function App() {
   const [apiresult, getapiresult] = useState("");
   const [selectedcoin, getselectedcoin] = useState("");
   const [selectedcurrency, getselectedcurrency] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [confettiflag, setconfettiflag] = useState(false);
+
+  const config = {
+    angle: "111",
+    spread: 360,
+    startVelocity: 40,
+    elementCount: 70,
+    dragFriction: 0.12,
+    duration: "1750",
+    stagger: 3,
+    width: "10px",
+    height: "10px",
+    perspective: "500px",
+    colors: ["#a864fd", "#29cdff", "#78ff44", "#ff718d", "#fdff6a"],
+  };
 
   const getallcoins = () => {
     axios
@@ -49,10 +68,12 @@ export default function App() {
 
   return (
     <div className="App">
-      <div>Cryptinfo</div>
-      <form
+      <div className="title">Cryptinfo</div>
+      <Form
         onSubmit={(e) => {
           console.log(selectedcoin);
+          setLoading(true);
+          setconfettiflag(false);
           axios
             .get(
               `https://api.coingecko.com/api/v3/simple/price?ids=${selectedcoin}&vs_currencies=${selectedcurrency}`
@@ -62,14 +83,18 @@ export default function App() {
               //console.log(response.data)
               // const tempresult= response.data
               //console.log(response)
+              
+              setLoading(false);
               if (Object.size(response.data) === 0) {
                 //console.log("haiii")
-                getapiresult("Please enter valid Coin name");
+                getapiresult("Please enter valid Input");
               } else {
-                const inttempresult = response.data[`${selectedcoin}`][`${selectedcurrency}`];
+                setconfettiflag(true);
+                const inttempresult =
+                  response.data[`${selectedcoin}`][`${selectedcurrency}`];
                 const strtempresult = inttempresult.toString();
                 //getapiresult(response.data[`${selectedcoin}`].inr)
-                getapiresult(strtempresult+` ${selectedcurrency}`);
+                getapiresult(strtempresult + ` ${selectedcurrency}`);
               }
               //console.log(apiresult)
               //console.log(strtempresult)
@@ -80,40 +105,49 @@ export default function App() {
           e.preventDefault();
         }}
       >
-      <label>Coin</label>
-        <input
-          type="text"
-          list="coins"
-          value={selectedcoin}
-          onChange={(e) => getselectedcoin(e.target.value)}
-        />
-        <datalist id="coins">
-          {
-            <>
-              {coins.map((coin) => {
-                return <option key={coin.id}>{coin.id}</option>;
-              })}
-            </>
-          }
-        </datalist>
-        <label>Currency</label>
-        <input
-          type="text"
-          list="currencies"
-          value={selectedcurrency}
-          onChange={(e) => getselectedcurrency(e.target.value)}
-        />
-        <datalist id="currencies">
-          {
-            <>
-              {currencies.map((currency) => {
-                return <option key={currency}>{currency}</option>;
-              })}
-            </>
-          }
-        </datalist>
-        <button> Submit </button>
-      </form>
+        <FormGroup>
+          <Label>Coin</Label>
+          <Input
+            type="text"
+            list="coins"
+            value={selectedcoin}
+            onChange={(e) => getselectedcoin(e.target.value)}
+          />
+          <datalist id="coins">
+            {
+              <>
+                {coins.map((coin) => {
+                  return <option key={coin.id}>{coin.id}</option>;
+                })}
+              </>
+            }
+          </datalist>
+        </FormGroup>
+        <FormGroup>
+          <Label>Currency</Label>
+          <Input
+            type="text"
+            list="currencies"
+            value={selectedcurrency}
+            onChange={(e) => getselectedcurrency(e.target.value)}
+          />
+          <datalist id="currencies">
+            {
+              <>
+                {currencies.map((currency) => {
+                  return <option key={currency}>{currency}</option>;
+                })}
+              </>
+            }
+          </datalist>
+        </FormGroup>
+        {loading && <LinearProgress color="primary" />}
+        <Button color="primary" block>
+          Submit</Button>
+        {/* <LinearProgress /> */}
+      </Form>
+      {<Confetti  active={confettiflag} config={config} />}
+
       <div id="result">{apiresult}</div>
       {/* {<>
         {coins.map((coin) => {
