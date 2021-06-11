@@ -69,6 +69,7 @@ export default function App() {
   return (
     <div className="App">
       <div className="title">Cryptinfo</div>
+      <div className="formDiv">
       <Form
         onSubmit={(e) => {
           console.log(selectedcoin);
@@ -112,6 +113,7 @@ export default function App() {
             list="coins"
             value={selectedcoin}
             onChange={(e) => getselectedcoin(e.target.value)}
+            required
           />
           <datalist id="coins">
             {
@@ -130,6 +132,7 @@ export default function App() {
             list="currencies"
             value={selectedcurrency}
             onChange={(e) => getselectedcurrency(e.target.value)}
+            required
           />
           <datalist id="currencies">
             {
@@ -144,16 +147,14 @@ export default function App() {
         {loading && <LinearProgress color="primary" />}
         <Button color="primary" block>
           Submit</Button>
-        {/* <LinearProgress /> */}
+        
       </Form>
+      </div>
       {<Confetti  active={confettiflag} config={config} />}
-
+      <div>
       <div id="result">{apiresult}</div>
-      {/* {<>
-        {coins.map((coin) => {
-          return <div key={coin.id}>{coin.name}</div>;
-        })}
-      </>}  */}
+      </div>
+      
     </div>
   );
 }
