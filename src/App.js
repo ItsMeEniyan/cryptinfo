@@ -1,7 +1,20 @@
 import "./App.css";
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { Button, Form, FormGroup, Label, Input } from "reactstrap";
+import {
+  Button,
+  Form,
+  FormGroup,
+  Label,
+  Input,
+  Collapse,
+  Navbar,
+  NavbarToggler,
+  NavbarBrand,
+  Nav,
+  NavItem,
+  NavLink,
+} from "reactstrap";
 import LinearProgress from "@material-ui/core/LinearProgress";
 import Confetti from "react-dom-confetti";
 
@@ -13,6 +26,9 @@ export default function App() {
   const [selectedcurrency, getselectedcurrency] = useState("");
   const [loading, setLoading] = useState(false);
   const [confettiflag, setconfettiflag] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
+
+  const toggle = () => setIsOpen(!isOpen);
 
   const config = {
     angle: "111",
@@ -68,93 +84,110 @@ export default function App() {
 
   return (
     <div className="App">
-      <div className="title">Cryptinfo</div>
-      <div className="formDiv">
-      <Form
-        onSubmit={(e) => {
-          console.log(selectedcoin);
-          setLoading(true);
-          setconfettiflag(false);
-          axios
-            .get(
-              `https://api.coingecko.com/api/v3/simple/price?ids=${selectedcoin}&vs_currencies=${selectedcurrency}`
-            )
-            .then((response) => {
-              //getapiresult(response.data);
-              //console.log(response.data)
-              // const tempresult= response.data
-              //console.log(response)
-              
-              setLoading(false);
-              if (Object.size(response.data) === 0) {
-                //console.log("haiii")
-                getapiresult("Please enter valid Input");
-              } else {
-                setconfettiflag(true);
-                const inttempresult =
-                  response.data[`${selectedcoin}`][`${selectedcurrency}`];
-                const strtempresult = inttempresult.toString();
-                //getapiresult(response.data[`${selectedcoin}`].inr)
-                getapiresult(strtempresult + ` ${selectedcurrency}`);
-              }
-              //console.log(apiresult)
-              //console.log(strtempresult)
-              //console.log(response.data[`${selectedcoin}`].inr)
-            })
-            .catch((error) => console.error(`Error: ${error}`));
+      <Navbar color="light" light expand="md">
+        <NavbarBrand style={{marginLeft:"10 px"}} href="/">Cryptinfo</NavbarBrand>
+        <NavbarToggler onClick={toggle} />
+        <Collapse isOpen={isOpen} navbar>
+          <Nav className="mr-auto" navbar>
+            <NavItem>
+              <NavLink
+                href="https://github.com/ItsMeEniyan/cryptinfo"
+                target="_blank"
+              >
+                GitHub
+              </NavLink>
+            </NavItem>
+          </Nav>
+        </Collapse>
+      </Navbar>
 
-          e.preventDefault();
-        }}
-      >
-        <FormGroup>
-          <Label>Coin</Label>
-          <Input
-            type="text"
-            list="coins"
-            value={selectedcoin}
-            onChange={(e) => getselectedcoin(e.target.value)}
-            required
-          />
-          <datalist id="coins">
-            {
-              <>
-                {coins.map((coin) => {
-                  return <option key={coin.id}>{coin.id}</option>;
-                })}
-              </>
-            }
-          </datalist>
-        </FormGroup>
-        <FormGroup>
-          <Label>Currency</Label>
-          <Input
-            type="text"
-            list="currencies"
-            value={selectedcurrency}
-            onChange={(e) => getselectedcurrency(e.target.value)}
-            required
-          />
-          <datalist id="currencies">
-            {
-              <>
-                {currencies.map((currency) => {
-                  return <option key={currency}>{currency}</option>;
-                })}
-              </>
-            }
-          </datalist>
-        </FormGroup>
-        {loading && <LinearProgress color="primary" />}
-        <Button color="primary" block>
-          Submit</Button>
+      <div className="formDiv">
+        <Form
+          onSubmit={(e) => {
+            console.log(selectedcoin);
+            setLoading(true);
+            setconfettiflag(false);
+            axios
+              .get(
+                `https://api.coingecko.com/api/v3/simple/price?ids=${selectedcoin}&vs_currencies=${selectedcurrency}`
+              )
+              .then((response) => {
+                //getapiresult(response.data);
+                //console.log(response.data)
+                // const tempresult= response.data
+                //console.log(response)
+
+                setLoading(false);
+                if (Object.size(response.data) === 0) {
+                  //console.log("haiii")
+                  getapiresult("Invalid Input :(");
+                } else {
+                  setconfettiflag(true);
+                  const inttempresult =
+                    response.data[`${selectedcoin}`][`${selectedcurrency}`];
+                  const strtempresult = inttempresult.toString();
+                  //getapiresult(response.data[`${selectedcoin}`].inr)
+                  getapiresult(strtempresult + ` ${selectedcurrency}`);
+                }
+                //console.log(apiresult)
+                //console.log(strtempresult)
+                //console.log(response.data[`${selectedcoin}`].inr)
+              })
+              .catch((error) => console.error(`Error: ${error}`));
+
+            e.preventDefault();
+          }}
+        >
+        <div className="title">Live Cryptocurreny price check</div>
+          <FormGroup>
+            <Label>Coin</Label>
+            <Input
+              type="text"
+              list="coins"
+              value={selectedcoin}
+              onChange={(e) => getselectedcoin(e.target.value)}
+              required
+            />
+            <datalist id="coins">
+              {
+                <>
+                  {coins.map((coin) => {
+                    return <option key={coin.id}>{coin.id}</option>;
+                  })}
+                </>
+              }
+            </datalist>
+          </FormGroup>
+          <FormGroup>
+            <Label>Currency</Label>
+            <Input
+              type="text"
+              list="currencies"
+              value={selectedcurrency}
+              onChange={(e) => getselectedcurrency(e.target.value)}
+              required
+            />
+            <datalist id="currencies">
+              {
+                <>
+                  {currencies.map((currency) => {
+                    return <option key={currency}>{currency}</option>;
+                  })}
+                </>
+              }
+            </datalist>
+          </FormGroup>
+          {loading && <LinearProgress color="primary" />}
+          <Button color="primary" block>
+            Submit
+          </Button>
+          {<Confetti active={confettiflag} config={config} />}
+        <div>
+          <div id="result">{apiresult}</div>
+        </div>
+        </Form>
         
-      </Form>
       </div>
-      {<Confetti  active={confettiflag} config={config} />}
-      <div>
-      <div id="result">{apiresult}</div>
-      </div>
-      
     </div>
   );
 }

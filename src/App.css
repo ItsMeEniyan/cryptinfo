@@ -1,13 +1,12 @@
-body{
-  height: 100vh;
+.formDiv{
+  height: 90vh;
   display: flex;
   justify-content: center;
   align-items: center;
 }
-.formDiv{
-}
+
 .title{
-  font-size: 40px;
+  font-weight: bold;
 }
 .confetti{
   position: absolute;
